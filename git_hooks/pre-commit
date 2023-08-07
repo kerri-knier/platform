@@ -2,3 +2,4 @@
 
 terraform fmt
 terraform validate
+terraform plan > terraform-plan.txt
