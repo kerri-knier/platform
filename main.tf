@@ -2,6 +2,10 @@
 
 provider "aws" {
   region = "eu-west-2"
+  
+  assume_role {
+    role_arn = "arn:aws:iam::586634938182:role/platform-cicd-oidc"
+  }
 }
 
 resource "aws_ecr_repository" "aws_ecr" {
