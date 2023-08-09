@@ -1,0 +1,49 @@
+name: OIDC terraform apply
+
+on:
+  push:
+    branches:
+      - 'main'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+    working-directory: .
+
+jobs:
+
+  deploy_production:
+    environment: production
+    name: 'Deploy to production'
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v3
+      name: Checkout repository
+    
+    - uses:  hashicorp/setup-terraform@v2
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        role-to-assume: arn:aws:iam::586634938182:role/platform-cicd-oidc
+        role-session-name: cicd-deployment
+        aws-region: eu-west-2
+
+    - name: Terraform Init
+      id: init
+      run: terraform init
+
+    - name: Terraform Validate
+      id: validate
+      run: terraform validate
+
+    - name: Terraform Apply
+      id: apply
+      run: terraform apply -auto-approve
