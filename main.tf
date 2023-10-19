@@ -17,10 +17,6 @@ resource "aws_ecs_cluster" "aws_ecs" {
   name = "platform-training-cluster"
 }
 
-resource "aws_ecs_cluster" "aws_ecs_TEST" {
-  name = "platform-training-cluster-TEST"
-}
-
 # variable "image" {}
 
 # resource "aws_ecs_task_definition" "aws_ecs_task" {
