@@ -51,7 +51,7 @@ See https://www.cisco.com/c/en/us/solutions/hybrid-work/what-is-high-availabilit
 #### What is high availability on AWS?
 https://docs.aws.amazon.com/whitepapers/latest/real-time-communication-on-aws/high-availability-and-scalability-on-aws.html
 
-To ensure high availability, systems should be designed with no single point of failure. These are commonly eliminated through `N+1` or `2N` redundancy configuration, coresponding to configuring active-active nodes and active-standy node pairs respectively.
+To ensure high availability, systems should be designed with no single point of failure. These are commonly eliminated through `N+1` or `2N` redundancy configuration, coresponding to configuring active-active nodes and active-standby node pairs respectively.
 Route 53 checks resource health and can be configured with either failover strategy.
 
 Systems should also correctly monitor availability and have prepared procedures for manual failure recovery mechanisms.
@@ -86,6 +86,37 @@ This video https://pages.awscloud.com/Building-Modern-Applications-at-AWS_2019_0
 
 #### Deployment steps
 
+0. Setup CICD
 1. Create an nginx docker image
 2. Upload the image to AWS ECR
 3. Run the image in AWS ECS
+
+## Interlude to setup the CICD
+
+Terraform state file keeps track of the current infrastructure. It's terraforms source of truth. Anyone working on the same terraform infrastructure needs access to that state file. However you could easily run into conflict with multiple people making changes and on top of that terraform state file holds passwords in plain text, so isn't suitable for git. Instead use terraform remote state with the file stored in an S3 bucket. This also makes it easy for the pipeline to manage.
+
+To run in the pipeline, we need a way to configure aws access securely.
+https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html
+
+For that we'll setup OIDC. This involves:
+1. Configure an OpenID connect identity provider in the IAM console using the provider URL and audience here: https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services#adding-the-identity-provider-to-aws
+2. Create a role with the newly created identity provider and the required permissions
+3. Update the trust policy with the specific git repo and branch
+4. github workflow (beware https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect#filtering-for-a-specific-branch)
+
+### Troubleshooting
+
+#### Configure AWS credentials 
+> Error: Not authorized to perform sts:AssumeRoleWithWebIdentity
+
+This was due to specifying a branch in the role, but using environment in the github action which prevents sending the branch to OIDC.
+
+#### Terraform init
+> Error refreshing state: AccessDenied: Access Denied
+
+Role was setup with Get/Put/Delete Object with the bucket as the resource, but it needed a wildcard to allow recursive permissions.
+
+#### Terraform apply
+> Error: configuring Terraform AWS Provider: IAM Role (arn:aws:iam::***:role/platform-cicd-oidc) cannot be assumed.
+
+Using IAM role configured in the previous step of github actions works, doesn't need to be set in the terraform configuration too.
