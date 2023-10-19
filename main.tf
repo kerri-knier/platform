@@ -23,8 +23,8 @@ variable "platform_image" {
 }
 
 resource "aws_ecs_task_definition" "aws_ecs_task" {
-  family       = "platform-training-ecs-task"
-  network_mode = "awsvpc"
+  family             = "platform-training-ecs-task"
+  network_mode       = "awsvpc"
   execution_role_arn = "arn:aws:iam::586634938182:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS"
   container_definitions = jsonencode([
     {
@@ -43,4 +43,10 @@ resource "aws_ecs_task_definition" "aws_ecs_task" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = 256
   memory                   = 512
+}
+
+resource "aws_ecs_service" "ecs_service" {
+  task_definition = aws_ecs_task_definition.aws_ecs_task
+  name            = "platform-training-ecs-service"
+  desired_count   = 1
 }
