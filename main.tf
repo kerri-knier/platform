@@ -15,12 +15,16 @@ resource "aws_ecr_repository" "aws_ecr" {
   }
 }
 
+resource "aws_s3_bucket" "test-bucket" {
+  bucket = "s3-test-bucket"
+}
+
 resource "aws_ecs_cluster" "aws_ecs" {
   name = "platform-training-cluster"
 }
-resource "aws_ecs_cluster" "aws_ecs_TEST" {
-  name = "platform-training-cluster-TEST"
-}
+# resource "aws_ecs_cluster" "aws_ecs_TEST" {
+#   name = "platform-training-cluster-TEST"
+# }
 
 # resource "aws_ecs_task_definition" "aws_ecs_task" {
 #   family = "platform-training-ecs-task"
