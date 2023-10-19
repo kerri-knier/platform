@@ -46,7 +46,8 @@ resource "aws_ecs_task_definition" "aws_ecs_task" {
 }
 
 resource "aws_ecs_service" "ecs_service" {
-  task_definition = aws_ecs_task_definition.aws_ecs_task
   name            = "platform-training-ecs-service"
+  cluster         = aws_ecs_cluster.aws_ecs.id
+  task_definition = aws_ecs_task_definition.aws_ecs_task.arn
   desired_count   = 1
 }
