@@ -35,6 +35,12 @@ jobs:
         role-session-name: cicd-deployment
         aws-region: eu-west-2
 
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+      with:
+        mask-password: 'true'
+
     - name: Terraform Init
       id: init
       run: terraform init
@@ -45,13 +51,7 @@ jobs:
 
     - name: Terraform Apply
       id: apply
-      run: terraform apply -auto-approve
-
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-      with:
-        mask-password: 'true'
+      run: terraform apply -auto-approve -var="platform_image=${{ steps.login-ecr.outputs.registry }}/platform-training-kerginx:${{ github.sha }}"
 
     - name: Build, tag, and push nginx image to Amazon ECR
       working-directory: nginx

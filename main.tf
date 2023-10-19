@@ -17,30 +17,29 @@ resource "aws_ecs_cluster" "aws_ecs" {
   name = "platform-training-cluster"
 }
 
-# variable "image" {}
+variable "platform_image" {
+  type     = string
+  nullable = false
+}
 
-# resource "aws_ecs_task_definition" "aws_ecs_task" {
-#   family = "platform-training-ecs-task"
-#   network_mode = "awsvpc"
-#   container_definitions = jsonencode([
-#     {
-#       "name": "platform-training-app",
-#       "image": var.image
-#       "portMappings": [
-#         {
-#           "containerPort": 80,
-#           "hostPort": 80,
-#           "protocol": "tcp",
-#         }
-#       ],
-#       "essential": true, 
-#             "entryPoint": [
-#                 "sh",
-# 	              "-c"
-#             ], 
-#             "command": [
-#                 "/bin/sh -c \"echo '<html> <head> <title>Amazon ECS Sample App</title> <style>body {margin-top: 40px; background-color: #333;} </style> </head><body> <div style=color:white;text-align:center> <h1>Amazon ECS Sample App</h1> <h2>Congratulations!</h2> <p>Your application is now running on a container in Amazon ECS.</p> </div></body></html>' >  /usr/local/apache2/htdocs/index.html && httpd-foreground\""
-#             ]
-#     }
-#   ])
-# }
+resource "aws_ecs_task_definition" "aws_ecs_task" {
+  family       = "platform-training-ecs-task"
+  network_mode = "awsvpc"
+  container_definitions = jsonencode([
+    {
+      "name" : "platform-training-app",
+      "image" : var.platform_image
+      "portMappings" : [
+        {
+          "containerPort" : 80,
+          "hostPort" : 80,
+          "protocol" : "tcp",
+        }
+      ],
+      "essential" : true,
+    }
+  ])
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = 256
+  memory                   = 512
+}
