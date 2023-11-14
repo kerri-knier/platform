@@ -41,6 +41,16 @@ jobs:
       with:
         mask-password: 'true'
 
+    - name: Build, tag, and push nginx image to Amazon ECR
+      working-directory: nginx
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: platform-training-kerginx
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
     - name: Terraform Init
       id: init
       run: terraform init
@@ -52,13 +62,3 @@ jobs:
     - name: Terraform Apply
       id: apply
       run: terraform apply -auto-approve -var="platform_image=${{ steps.login-ecr.outputs.registry }}/platform-training-kerginx:${{ github.sha }}"
-
-    - name: Build, tag, and push nginx image to Amazon ECR
-      working-directory: nginx
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: platform-training-kerginx
-        IMAGE_TAG: ${{ github.sha }}
-      run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
