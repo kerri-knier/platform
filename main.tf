@@ -47,13 +47,14 @@ resource "aws_ecs_task_definition" "aws_ecs_task" {
 
 data "aws_subnets" "default_subnet" {
   filter {
-    name = "vpc-id"
+    name   = "vpc-id"
     values = ["vpc-06db0118879aa0ecd"]
   }
 }
 
 resource "aws_ecs_service" "ecs_service" {
   name            = "platform-training-ecs-service"
+  launch_type     = "FARGATE"
   cluster         = aws_ecs_cluster.aws_ecs.id
   task_definition = aws_ecs_task_definition.aws_ecs_task.arn
   desired_count   = 1
