@@ -29,7 +29,7 @@ resource "aws_ecs_task_definition" "aws_ecs_task" {
   container_definitions = jsonencode([
     {
       "name" : "platform-training-app",
-      "image" : var.platform_image
+      "image" : "586634938182.dkr.ecr.eu-west-2.amazonaws.com/platform-training-kerginx:fc64b265c8303e7bba01976a626e81978fb64dbf",
       "portMappings" : [
         {
           "containerPort" : 80,
