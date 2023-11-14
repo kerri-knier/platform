@@ -120,3 +120,10 @@ Role was setup with Get/Put/Delete Object with the bucket as the resource, but i
 > Error: configuring Terraform AWS Provider: IAM Role (arn:aws:iam::***:role/platform-cicd-oidc) cannot be assumed.
 
 Using IAM role configured in the previous step of github actions works, doesn't need to be set in the terraform configuration too.
+
+#### ECS
+> Error: no container instances found in cluster
+
+Terraform successfully applied and the pipeline passed, but when checking AWS console the task failed to start. This was due to specifying aws_ecs_service without a launch_type, which defaults to EC2 instead of FARGATE.
+
+> Error: ECS was unable to assume the role 'AWSServiceRoleForECS' that was provided for this task
