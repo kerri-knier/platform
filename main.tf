@@ -45,9 +45,20 @@ resource "aws_ecs_task_definition" "aws_ecs_task" {
   memory                   = 512
 }
 
+data "aws_subnets" "default_subnet" {
+  filter {
+    name = "vpc-id"
+    values = ["vpc-06db0118879aa0ecd"]
+  }
+}
+
 resource "aws_ecs_service" "ecs_service" {
   name            = "platform-training-ecs-service"
   cluster         = aws_ecs_cluster.aws_ecs.id
   task_definition = aws_ecs_task_definition.aws_ecs_task.arn
   desired_count   = 1
+
+  network_configuration {
+    subnets = data.aws_subnets.default_subnet.ids
+  }
 }
