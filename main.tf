@@ -61,6 +61,13 @@ data "aws_subnets" "default_subnet" {
   }
 }
 
+data "aws_security_groups" "vpc_security_groups" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default_vpc.id]
+  }
+}
+
 resource "aws_ecs_service" "ecs_service" {
   name            = "platform-training-ecs-service"
   launch_type     = "FARGATE"
@@ -70,6 +77,7 @@ resource "aws_ecs_service" "ecs_service" {
 
   network_configuration {
     subnets = data.aws_subnets.default_subnet.ids
+    security_groups = data.aws_security_groups.vpc_security_groups.ids
   }
 }
 
