@@ -35,6 +35,7 @@ resource "aws_ecs_task_definition" "aws_ecs_task" {
           "containerPort" : 80,
           "hostPort" : 80,
           "protocol" : "tcp",
+          "appProtocol": "http",
         }
       ],
       "essential" : true,
@@ -43,6 +44,10 @@ resource "aws_ecs_task_definition" "aws_ecs_task" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = 256
   memory                   = 512
+  runtime_platform {
+    cpu_architecture = "X86_64"
+    operating_system_family = "LINUX"
+  }
 }
 
 data "aws_vpc" "default_vpc" {
@@ -51,8 +56,8 @@ data "aws_vpc" "default_vpc" {
 
 data "aws_subnets" "default_subnet" {
   filter {
-    name = "vpc-id"
-    values = [ data.aws_vpc.default_vpc.id ]
+    name   = "vpc-id"
+    values = [data.aws_vpc.default_vpc.id]
   }
 }
 
