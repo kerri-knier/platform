@@ -76,8 +76,9 @@ resource "aws_ecs_service" "ecs_service" {
   desired_count   = 1
 
   network_configuration {
-    subnets = data.aws_subnets.default_subnet.ids
-    security_groups = data.aws_security_groups.vpc_security_groups.ids
+    security_groups  = data.aws_security_groups.vpc_security_groups.ids
+    subnets          = data.aws_subnets.default_subnet.ids
+    assign_public_ip = true
   }
 }
 
