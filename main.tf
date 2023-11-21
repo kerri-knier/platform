@@ -25,7 +25,7 @@ variable "platform_image" {
 resource "aws_ecs_task_definition" "aws_ecs_task" {
   family             = "platform-training-ecs-task"
   network_mode       = "awsvpc"
-  execution_role_arn = "arn:aws:iam::586634938182:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS"
+  execution_role_arn = "arn:aws:iam::586634938182:role/ecsTaskExecutionRole"
   container_definitions = jsonencode([
     {
       "name" : "platform-training-app",
@@ -45,10 +45,14 @@ resource "aws_ecs_task_definition" "aws_ecs_task" {
   memory                   = 512
 }
 
+data "aws_vpc" "default_vpc" {
+  default = true
+}
+
 data "aws_subnets" "default_subnet" {
   filter {
-    name   = "vpc-id"
-    values = ["vpc-06db0118879aa0ecd"]
+    name = "vpc-id"
+    values = [ data.aws_vpc.default_vpc.id ]
   }
 }
 

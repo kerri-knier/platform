@@ -104,6 +104,32 @@ For that we'll setup OIDC. This involves:
 3. Update the trust policy with the specific git repo and branch
 4. github workflow (beware https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect#filtering-for-a-specific-branch)
 
+## Upload the image to ECR
+
+An ECR repository can be created easily using the `aws_ecr_repository` resource in terraform, requiring only a name.
+
+Most projects will require unique image tags for each build for reproducibility. To facilitate this, set `image_tag_immutability` to `IMMUTABLE`. To create unique tags, I chose the git hash as this easily identifies the associated commit and can easily be retrieved in the cicd pipeline using the `github.sha` variable.
+
+Then enable image scanning on push with
+```
+image_scanning_configuration {
+    scan_on_push = true
+  }
+```
+
+To push to this repository in the pipeline, login to ECR using `aws-actions/amazon-ecr-login@v1` action. Then run the usual docker commands to build and push the image, making sure to tag it appropriately `$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG`.
+
+## Run the image in ECS
+
+To set up the image in ECS using AWS Fargate:
+1. Create an `aws_ecs_cluster`
+2. Create an `aws_ecs_task_definition` defined by the nginx image
+3. Define data for the `aws_subnet_ids`
+4. Create an `aws_ecs_service` within the cluster, defined by the task definition, and configure the network to use the subnet.
+
+Possibly using https://docs.aws.amazon.com/AmazonECS/latest/userguide/ECS_AWSCLI_Fargate.html
+But converting to terraform
+
 ### Troubleshooting
 
 #### Configure AWS credentials 
