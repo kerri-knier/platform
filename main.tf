@@ -35,7 +35,7 @@ resource "aws_ecs_task_definition" "aws_ecs_task" {
           "containerPort" : 80,
           "hostPort" : 80,
           "protocol" : "tcp",
-          "appProtocol": "http",
+          "appProtocol" : "http",
         }
       ],
       "essential" : true,
@@ -45,7 +45,7 @@ resource "aws_ecs_task_definition" "aws_ecs_task" {
   cpu                      = 256
   memory                   = 512
   runtime_platform {
-    cpu_architecture = "X86_64"
+    cpu_architecture        = "X86_64"
     operating_system_family = "LINUX"
   }
 }
@@ -70,5 +70,17 @@ resource "aws_ecs_service" "ecs_service" {
 
   network_configuration {
     subnets = data.aws_subnets.default_subnet.ids
+  }
+}
+
+resource "aws_ecs_cluster_capacity_providers" "aws_capacity_provider" {
+  cluster_name = aws_ecs_cluster.aws_ecs.name
+
+  capacity_providers = ["FARGATE"]
+
+  default_capacity_provider_strategy {
+    base              = 1
+    weight            = 100
+    capacity_provider = "FARGATE"
   }
 }
