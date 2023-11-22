@@ -44,10 +44,22 @@ resource "aws_iam_role_policy" "ecs_exec" {
   policy = data.aws_iam_policy_document.ecs_exec.json
 }
 
+data "aws_iam_policy_document" "ecs_task_execution" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ecs-tasks.amazonaws.com"]
+    }
+  }
+}
+
 resource "aws_iam_role" "ecs_exec" {
   name               = "ecs_exec_role"
   path               = "/platformtraining/"
-  assume_role_policy = ""
+  assume_role_policy = data.aws_iam_policy_document.ecs_task_execution.json
 }
 
 resource "aws_ecs_task_definition" "aws_ecs_task" {
@@ -55,6 +67,7 @@ resource "aws_ecs_task_definition" "aws_ecs_task" {
   network_mode       = "awsvpc"
   task_role_arn      = aws_iam_role.ecs_exec.arn
   execution_role_arn = "arn:aws:iam::586634938182:role/ecsTaskExecutionRole"
+
   container_definitions = jsonencode([
     {
       "name" : "platform-training-app",
