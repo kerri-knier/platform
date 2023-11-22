@@ -27,7 +27,7 @@ data "aws_iam_policy_document" "ecs_exec" {
     effect = "Allow"
     actions = [
       "ssmmessages:CreateControlChannel",
-      "sssmessages:CreateDataChannel",
+      "ssmmessages:CreateDataChannel",
       "ssmmessages:OpenControlChannel",
       "ssmmessages:OpenDataChannel"
     ]
