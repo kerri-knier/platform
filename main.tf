@@ -81,6 +81,10 @@ resource "aws_ecs_service" "ecs_service" {
     subnets          = data.aws_subnets.default_subnet.ids
     assign_public_ip = true
   }
+
+  lifecycle {
+    ignore_changes = [ desired_count ]
+  }
 }
 
 resource "aws_appautoscaling_target" "ecs_target" {
@@ -99,6 +103,10 @@ resource "aws_appautoscaling_policy" "ecs_scaling" {
   service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
 
   target_tracking_scaling_policy_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+
     target_value       = 70
     scale_in_cooldown  = 300
     scale_out_cooldown = 300
