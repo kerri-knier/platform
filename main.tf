@@ -74,7 +74,7 @@ resource "aws_ecs_service" "ecs_service" {
   cluster         = aws_ecs_cluster.aws_ecs.id
   task_definition = aws_ecs_task_definition.aws_ecs_task.arn
   # Remember to avoid leaving this running!
-  desired_count   = 0 
+  desired_count = 3
 
   network_configuration {
     security_groups  = data.aws_security_groups.vpc_security_groups.ids
@@ -82,15 +82,3 @@ resource "aws_ecs_service" "ecs_service" {
     assign_public_ip = true
   }
 }
-
-# resource "aws_ecs_cluster_capacity_providers" "aws_capacity_provider" {
-#   cluster_name = aws_ecs_cluster.aws_ecs.name
-
-#   capacity_providers = ["FARGATE"]
-
-#   default_capacity_provider_strategy {
-#     base              = 1
-#     weight            = 100
-#     capacity_provider = "FARGATE"
-#   }
-# }
