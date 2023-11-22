@@ -22,9 +22,29 @@ variable "platform_image" {
   nullable = false
 }
 
+data "aws_iam_policy_document" "ecs_exec_policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ssmmessages:CreateControlChannel",
+      "sssmessages:CreateDataChannel",
+      "ssmmessages:OpenControlChannel",
+      "ssmmessages:OpenDataChannel"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role" "ecs_exec" {
+  name               = "ecs_exec_role"
+  path               = "/system"
+  assume_role_policy = data.aws_iam_policy_document.ecs_exec_policy.json
+}
+
 resource "aws_ecs_task_definition" "aws_ecs_task" {
   family             = "platform-training-ecs-task"
   network_mode       = "awsvpc"
+  task_role_arn      = aws_iam_role.ecs_exec.arn
   execution_role_arn = "arn:aws:iam::586634938182:role/ecsTaskExecutionRole"
   container_definitions = jsonencode([
     {
