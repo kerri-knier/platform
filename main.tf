@@ -22,7 +22,7 @@ variable "platform_image" {
   nullable = false
 }
 
-data "aws_iam_policy_document" "ecs_exec_policy" {
+data "aws_iam_policy_document" "ecs_exec" {
   statement {
     effect = "Allow"
     actions = [
@@ -31,13 +31,23 @@ data "aws_iam_policy_document" "ecs_exec_policy" {
       "ssmmessages:OpenControlChannel",
       "ssmmessages:OpenDataChannel"
     ]
+    resources = ["*"]
   }
+}
+
+# For a given role, this resource is incompatible with using the aws_iam_role resource inline_policy argument.
+# When using that argument and this resource, both will attempt to manage the role's inline policies and
+# Terraform will show a permanent difference.
+resource "aws_iam_role_policy" "ecs_exec" {
+  name   = "ecs_exec_policy"
+  role   = aws_iam_role.ecs_exec.id
+  policy = data.aws_iam_policy_document.ecs_exec.json
 }
 
 resource "aws_iam_role" "ecs_exec" {
   name               = "ecs_exec_role"
   path               = "/platformtraining/"
-  assume_role_policy = data.aws_iam_policy_document.ecs_exec_policy.json
+  assume_role_policy = ""
 }
 
 resource "aws_ecs_task_definition" "aws_ecs_task" {
