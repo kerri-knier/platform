@@ -82,3 +82,25 @@ resource "aws_ecs_service" "ecs_service" {
     assign_public_ip = true
   }
 }
+
+resource "aws_appautoscaling_target" "ecs_target" {
+  min_capacity       = 0
+  max_capacity       = 4
+  resource_id        = "service/${aws_ecs_cluster.aws_ecs.name}/${aws_ecs_service.ecs_service.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+}
+
+resource "aws_appautoscaling_policy" "ecs_scaling" {
+  name               = "platform-training-ecs-autoscale-policy"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.ecs_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    target_value       = 70
+    scale_in_cooldown  = 300
+    scale_out_cooldown = 300
+  }
+}

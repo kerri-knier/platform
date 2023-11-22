@@ -130,6 +130,14 @@ To set up the image in ECS using AWS Fargate:
 Possibly using https://docs.aws.amazon.com/AmazonECS/latest/userguide/ECS_AWSCLI_Fargate.html
 But converting to terraform
 
+### High availability
+Tasks use the replica scheduling strategy by default, which balances tasks across availability zones.
+Ref: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs_services.html#service_scheduler_replica
+
+### Autoscaling
+ECS autoscaling is managed by Application Auto Scaling, which requires aws_appautoscaling_target and aws_appautoscaling_policy to be configured in terraform.
+Ref: https://docs.aws.amazon.com/autoscaling/application/userguide/what-is-application-auto-scaling.html
+
 ### Troubleshooting
 
 #### Configure AWS credentials 
