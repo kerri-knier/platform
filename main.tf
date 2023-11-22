@@ -75,6 +75,8 @@ resource "aws_ecs_service" "ecs_service" {
   task_definition = aws_ecs_task_definition.aws_ecs_task.arn
   # Remember to avoid leaving this running!
   desired_count = 3
+  # allow commands to be executed via aws cli
+  enable_execute_command = true
 
   network_configuration {
     security_groups  = data.aws_security_groups.vpc_security_groups.ids
