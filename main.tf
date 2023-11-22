@@ -83,12 +83,12 @@ resource "aws_ecs_service" "ecs_service" {
   }
 
   lifecycle {
-    ignore_changes = [ desired_count ]
+    ignore_changes = [desired_count]
   }
 }
 
 resource "aws_appautoscaling_target" "ecs_target" {
-  min_capacity       = 0
+  min_capacity       = 1
   max_capacity       = 4
   resource_id        = "service/${aws_ecs_cluster.aws_ecs.name}/${aws_ecs_service.ecs_service.name}"
   scalable_dimension = "ecs:service:DesiredCount"
