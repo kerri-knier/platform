@@ -37,7 +37,7 @@ data "aws_iam_policy_document" "ecs_exec_policy" {
 
 resource "aws_iam_role" "ecs_exec" {
   name               = "ecs_exec_role"
-  path               = "/system"
+  path               = "/platformtraining/"
   assume_role_policy = data.aws_iam_policy_document.ecs_exec_policy.json
 }
 
