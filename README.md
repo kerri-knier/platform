@@ -138,6 +138,22 @@ Ref: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs_services.ht
 ECS autoscaling is managed by Application Auto Scaling, which requires aws_appautoscaling_target and aws_appautoscaling_policy to be configured in terraform.
 Ref: https://docs.aws.amazon.com/autoscaling/application/userguide/what-is-application-auto-scaling.html
 
+### Receiving inbound connections
+To access ping our docker container from the internet, it needs to accept inbound connections. For large scale HTTP based services, either Application Load Balancer or Amazon API Gateway are well suited to provide a scalable input layer. ALB costs per hour, whereas API Gateway charges per request. However API Gateway distributes traffic based on endpoints, so still requires a load balancer to 
+
+For local use you can add inbound rules, to the security group, to allow anyone to access the web server port and to allow pinging.
+
+Ref: https://docs.aws.amazon.com/AmazonECS/latest/bestpracticesguide/networking-inbound.html
+
+### Connecting to the container
+Use aws ecs execute-command on the cli:
+`aws ecs execute-command --cluster platform-training-cluster --task <task-id> --container platform-training-app --interactive --command "sh"`
+Windows shenanigans seem to only work without the "/bin/" prefix and bash isn't in the path of the nginx image.
+
+This required enabling execute command in the ecs service, and providing additional permissions through the task_role_arn of the task definition. As well as downloading session-manager-plugin for the cli.
+
+Ref: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-exec.html
+
 ### Troubleshooting
 
 #### Configure AWS credentials 

@@ -22,6 +22,7 @@ variable "platform_image" {
   nullable = false
 }
 
+# this provides permissions for using aws ecs execute-command
 data "aws_iam_policy_document" "ecs_exec" {
   statement {
     effect = "Allow"
@@ -116,7 +117,7 @@ resource "aws_ecs_service" "ecs_service" {
   cluster         = aws_ecs_cluster.aws_ecs.id
   task_definition = aws_ecs_task_definition.aws_ecs_task.arn
   # Remember to avoid leaving this running!
-  desired_count = 3
+  desired_count = 0
   # allow commands to be executed via aws cli
   enable_execute_command = true
 
@@ -132,7 +133,8 @@ resource "aws_ecs_service" "ecs_service" {
 }
 
 resource "aws_appautoscaling_target" "ecs_target" {
-  min_capacity       = 1
+  # Remember to avoid leaving this running!
+  min_capacity       = 0
   max_capacity       = 4
   resource_id        = "service/${aws_ecs_cluster.aws_ecs.name}/${aws_ecs_service.ecs_service.name}"
   scalable_dimension = "ecs:service:DesiredCount"
