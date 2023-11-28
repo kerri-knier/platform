@@ -154,6 +154,22 @@ This required enabling execute command in the ecs service, and providing additio
 
 Ref: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-exec.html
 
+### Centralise logs from the nginx servers
+
+This is done by creating a cloudwatch log group and specifying a logConfiguration in the ecs task definition.
+
+Ref: https://aws.amazon.com/blogs/compute/centralized-container-logs-with-amazon-ecs-and-amazon-cloudwatch-logs/
+
+### Setting up a CDN
+
+In order to use AWS CloudFront, AWS' CDN solution, we need to configure a compatible service first. We're using ECS, so Amaon S3, mediastore container and mediapackage container aren't feasible options. API Gateway requires a load balancer in order to handle distribution of a single route across multiple containers. We don't require any special features from API Gateway right now, so using an Elastic Load Balancer directly is the best option here.
+
+#### Elastic Load Balancer 
+
+The Elastic Load Balancer has a few configuration options. Since we are dealing with HTTP requests, the Application Load Balancer is best suited. Ref: https://aws.amazon.com/elasticloadbalancing/faqs/
+
+
+
 ### Troubleshooting
 
 #### Configure AWS credentials 
