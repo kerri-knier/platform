@@ -17,11 +17,6 @@ resource "aws_ecs_cluster" "aws_ecs" {
   name = "platform-training-cluster"
 }
 
-variable "platform_image" {
-  type     = string
-  nullable = false
-}
-
 # this provides permissions for using aws ecs execute-command
 data "aws_iam_policy_document" "ecs_exec" {
   statement {
@@ -71,12 +66,12 @@ resource "aws_ecs_task_definition" "aws_ecs_task" {
 
   container_definitions = jsonencode([
     {
-      "name" : "platform-training-app",
+      "name" : var.platform_container_name,
       "image" : var.platform_image,
       "portMappings" : [
         {
           "containerPort" : 80,
-          "hostPort" : 80,
+          "hostPort" : var.platform_container_port,
           "protocol" : "tcp",
           "appProtocol" : "http",
         }
@@ -119,6 +114,14 @@ data "aws_security_groups" "vpc_security_groups" {
   }
 }
 
+resource "aws_lb_target_group" "ecs_target" {
+  name        = "platform-training-ecs-target"
+  port        = var.platform_container_port
+  protocol    = "HTTP"
+  target_type = "ip"
+  vpc_id      = data.aws_vpc.default_vpc.id
+}
+
 resource "aws_ecs_service" "ecs_service" {
   name            = "platform-training-ecs-service"
   launch_type     = "FARGATE"
@@ -132,6 +135,12 @@ resource "aws_ecs_service" "ecs_service" {
     security_groups  = data.aws_security_groups.vpc_security_groups.ids
     subnets          = data.aws_subnets.default_subnet.ids
     assign_public_ip = true
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.ecs_target.arn
+    container_name   = var.platform_container_name
+    container_port   = var.platform_container_port
   }
 
   lifecycle {

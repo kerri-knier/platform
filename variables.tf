@@ -3,3 +3,17 @@ variable "container_name" {
   type        = string
   default     = "kerginx"
 }
+
+variable "platform_image" {
+  type = string
+}
+
+variable "platform_container_name" {
+  type    = string
+  default = "platform-training-app"
+}
+
+variable "platform_container_port" {
+  type    = number
+  default = 80
+}
