@@ -116,8 +116,7 @@ resource "aws_ecs_service" "ecs_service" {
   launch_type     = "FARGATE"
   cluster         = aws_ecs_cluster.aws_ecs.id
   task_definition = aws_ecs_task_definition.aws_ecs_task.arn
-  # Remember to avoid leaving this running!
-  desired_count = 0
+  desired_count = 1
   # allow commands to be executed via aws cli
   enable_execute_command = true
 
@@ -133,8 +132,7 @@ resource "aws_ecs_service" "ecs_service" {
 }
 
 resource "aws_appautoscaling_target" "ecs_target" {
-  # Remember to avoid leaving this running!
-  min_capacity       = 0
+  min_capacity       = 1
   max_capacity       = 4
   resource_id        = "service/${aws_ecs_cluster.aws_ecs.name}/${aws_ecs_service.ecs_service.name}"
   scalable_dimension = "ecs:service:DesiredCount"
