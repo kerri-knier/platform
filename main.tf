@@ -114,6 +114,14 @@ data "aws_security_groups" "vpc_security_groups" {
   }
 }
 
+resource "aws_lb" "ecs_lb" {
+  name               = "platform-training-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = data.aws_security_groups.vpc_security_groups.ids
+  subnets            = data.aws_subnets.default_subnet.ids
+}
+
 resource "aws_lb_target_group" "ecs_target" {
   name        = "platform-training-ecs-target"
   port        = var.platform_container_port
