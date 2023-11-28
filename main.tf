@@ -85,6 +85,7 @@ resource "aws_ecs_task_definition" "aws_ecs_task" {
       "logConfiguration" : {
         "logDriver" : "awslogs",
         "options" : {
+          "awslogs-create-group" : "true",
           "awslogs-group" : "/ecs/platform-training",
           "awslogs-region" : "eu-west-2",
           "awslogs-stream-prefix" : "platform-nginx"
