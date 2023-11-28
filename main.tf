@@ -167,4 +167,6 @@ resource "aws_appautoscaling_policy" "ecs_scaling" {
 
 resource "aws_cloudwatch_log_group" "platform_logs" {
   name = "/ecs/platform-training-logs"
+
+  retention_in_days = 1
 }
