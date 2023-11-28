@@ -85,10 +85,9 @@ resource "aws_ecs_task_definition" "aws_ecs_task" {
       "logConfiguration" : {
         "logDriver" : "awslogs",
         "options" : {
-          "awslogs-create-group" : "true",
-          "awslogs-group" : "/ecs/platform-training",
+          "awslogs-group" : aws_cloudwatch_log_group.platform_logs.name,
           "awslogs-region" : "eu-west-2",
-          "awslogs-stream-prefix" : "platform-nginx"
+          "awslogs-stream-prefix" : "platform-kerginx"
         }
       },
     }
@@ -164,4 +163,8 @@ resource "aws_appautoscaling_policy" "ecs_scaling" {
     scale_in_cooldown  = 300
     scale_out_cooldown = 300
   }
+}
+
+resource "aws_cloudwatch_log_group" "platform_logs" {
+  name = "/ecs/platform-training-logs"
 }
