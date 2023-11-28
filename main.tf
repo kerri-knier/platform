@@ -234,5 +234,6 @@ resource "aws_cloudfront_distribution" "ecs_distribution" {
   }
 
   viewer_certificate {
+    cloudfront_default_certificate = true
   }
 }
