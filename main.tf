@@ -132,7 +132,7 @@ resource "aws_lb_target_group" "ecs_lb_target" {
 
 resource "aws_lb_listener" "ecs_lb_listener" {
   load_balancer_arn = aws_lb.ecs_lb.arn
-  port              = var.platform_container_port
+  port              = 80
   protocol          = "HTTP"
 
   default_action {
@@ -197,4 +197,35 @@ resource "aws_cloudwatch_log_group" "platform_logs" {
   name = "/ecs/platform-training-logs"
 
   retention_in_days = 1
+}
+
+data "aws_cloudfront_cache_policy" "disabled" {
+  name = "Managed-CachingDisabled"
+}
+
+resource "aws_cloudfront_distribution" "ecs_distribution" {
+  origin {
+    domain_name = aws_lb.ecs_lb.dns_name
+    origin_id   = aws_lb.ecs_lb.id
+  }
+
+  enabled = true
+
+  default_cache_behavior {
+    cache_policy_id        = data.aws_cloudfront_cache_policy.disabled.id
+    allowed_methods        = ["GET", "HEAD"]
+    cached_methods         = []
+    target_origin_id       = aws_lb.ecs_lb.id
+    viewer_protocol_policy = "allow-all"
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "whitelist"
+      locations        = ["GB"]
+    }
+  }
+
+  viewer_certificate {
+  }
 }
