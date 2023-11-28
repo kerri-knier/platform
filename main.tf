@@ -122,12 +122,23 @@ resource "aws_lb" "ecs_lb" {
   subnets            = data.aws_subnets.default_subnet.ids
 }
 
-resource "aws_lb_target_group" "ecs_target" {
+resource "aws_lb_target_group" "ecs_lb_target" {
   name        = "platform-training-ecs-target"
   port        = var.platform_container_port
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = data.aws_vpc.default_vpc.id
+}
+
+resource "aws_lb_listener" "ecs_lb_listener" {
+  load_balancer_arn = aws_lb.ecs_lb.arn
+  port              = var.platform_container_port
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.ecs_lb_target.arn
+  }
 }
 
 resource "aws_ecs_service" "ecs_service" {
@@ -146,7 +157,7 @@ resource "aws_ecs_service" "ecs_service" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.ecs_target.arn
+    target_group_arn = aws_lb_target_group.ecs_lb_target.arn
     container_name   = var.platform_container_name
     container_port   = var.platform_container_port
   }
