@@ -82,6 +82,14 @@ resource "aws_ecs_task_definition" "aws_ecs_task" {
         }
       ],
       "essential" : true,
+      "logConfiguration" : {
+        "logDriver" : "awslogs",
+        "options" : {
+          "awslogs-group" : "/ecs/platform-training",
+          "awslogs-region" : "eu-west-2",
+          "awslogs-stream-prefix" : "platform-nginx"
+        }
+      },
     }
   ])
   requires_compatibilities = ["FARGATE"]
@@ -116,7 +124,7 @@ resource "aws_ecs_service" "ecs_service" {
   launch_type     = "FARGATE"
   cluster         = aws_ecs_cluster.aws_ecs.id
   task_definition = aws_ecs_task_definition.aws_ecs_task.arn
-  desired_count = 1
+  desired_count   = 1
   # allow commands to be executed via aws cli
   enable_execute_command = true
 
