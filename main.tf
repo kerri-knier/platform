@@ -221,7 +221,7 @@ resource "aws_cloudfront_distribution" "ecs_distribution" {
   default_cache_behavior {
     cache_policy_id        = data.aws_cloudfront_cache_policy.disabled.id
     allowed_methods        = ["GET", "HEAD"]
-    cached_methods         = []
+    cached_methods         = ["GET", "HEAD"]
     target_origin_id       = aws_lb.ecs_lb.id
     viewer_protocol_policy = "allow-all"
   }
