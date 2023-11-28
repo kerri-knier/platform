@@ -207,6 +207,13 @@ resource "aws_cloudfront_distribution" "ecs_distribution" {
   origin {
     domain_name = aws_lb.ecs_lb.dns_name
     origin_id   = aws_lb.ecs_lb.id
+
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 80
+      origin_protocol_policy = "http-only"
+      origin_ssl_protocols   = ["TLSv1"]
+    }
   }
 
   enabled = true
