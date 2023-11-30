@@ -216,14 +216,15 @@ resource "aws_cloudfront_distribution" "ecs_distribution" {
     }
   }
 
-  enabled = true
+  enabled    = true
+  # web_acl_id = aws_wafv2_web_acl.waf.arn
 
   default_cache_behavior {
     cache_policy_id        = data.aws_cloudfront_cache_policy.disabled.id
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
     target_origin_id       = aws_lb.ecs_lb.id
-    viewer_protocol_policy = "redirect-to-https"
+    viewer_protocol_policy = "https-only"
   }
 
   restrictions {
@@ -237,3 +238,18 @@ resource "aws_cloudfront_distribution" "ecs_distribution" {
     cloudfront_default_certificate = true
   }
 }
+
+# resource "aws_wafv2_web_acl" "waf" {
+#   name  = "platform-cdn-waf"
+#   scope = "CLOUDFRONT"
+
+#   default_action {
+
+#   }
+
+#   visibility_config {
+#     cloudwatch_metrics_enabled = false
+#     sampled_requests_enabled   = false
+#     metric_name                = "waf-metric"
+#   }
+# }
