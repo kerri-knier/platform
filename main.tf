@@ -123,9 +123,9 @@ resource "aws_lb" "ecs_lb" {
 }
 
 resource "aws_lb_target_group" "ecs_lb_target" {
-  name        = "platform-training-ecs-target"
-  port        = 80
-  protocol    = "HTTP"
+  name     = "platform-training-ecs-target"
+  port     = 80
+  protocol = "HTTP"
   # port        = 443
   # protocol    = "HTTPS"
   target_type = "ip"
@@ -220,12 +220,12 @@ resource "aws_cloudfront_distribution" "ecs_distribution" {
       https_port             = 443
       origin_protocol_policy = "http-only"
       # origin_protocol_policy = "https-only"
-      origin_ssl_protocols   = ["TLSv1"]
+      origin_ssl_protocols = ["TLSv1"]
     }
   }
 
-  enabled = true
-  # web_acl_id = aws_wafv2_web_acl.waf.arn
+  enabled    = true
+  web_acl_id = aws_wafv2_web_acl.waf.arn
 
   default_cache_behavior {
     cache_policy_id        = data.aws_cloudfront_cache_policy.disabled.id
@@ -247,17 +247,68 @@ resource "aws_cloudfront_distribution" "ecs_distribution" {
   }
 }
 
-# resource "aws_wafv2_web_acl" "waf" {
-#   name  = "platform-cdn-waf"
-#   scope = "CLOUDFRONT"
+resource "aws_wafv2_web_acl" "waf" {
+  name  = "platform-cdn-waf"
+  scope = "CLOUDFRONT"
 
-#   default_action {
+  default_action {
+    allow {
+    }
+  }
 
-#   }
+  rule {
+    name     = "CommonRuleSet"
+    priority = 1
 
-#   visibility_config {
-#     cloudwatch_metrics_enabled = false
-#     sampled_requests_enabled   = false
-#     metric_name                = "waf-metric"
-#   }
-# }
+    override_action {
+      count {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesCommonRuleSet"
+        vendor_name = "AWS"
+      }
+
+      rate_based_statement {
+        limit              = 300
+        aggregate_key_type = "IP"
+      }
+    }
+
+    visibility_config {
+      metric_name                = "waf-common-rule-set"
+      cloudwatch_metrics_enabled = false
+      sampled_requests_enabled   = false
+    }
+  }
+
+
+  rule {
+    name     = "RateLimit"
+    priority = 2
+
+    action {
+      block {}
+    }
+
+    statement {
+      rate_based_statement {
+        limit              = 300
+        aggregate_key_type = "IP"
+      }
+    }
+
+    visibility_config {
+      metric_name                = "waf-rate-limit"
+      cloudwatch_metrics_enabled = false
+      sampled_requests_enabled   = false
+    }
+  }
+
+  visibility_config {
+    metric_name                = "waf-metric"
+    cloudwatch_metrics_enabled = false
+    sampled_requests_enabled   = false
+  }
+}
