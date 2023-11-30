@@ -124,16 +124,23 @@ resource "aws_lb" "ecs_lb" {
 
 resource "aws_lb_target_group" "ecs_lb_target" {
   name        = "platform-training-ecs-target"
-  port        = var.platform_container_port
+  port        = 80
   protocol    = "HTTP"
+  # port        = 443
+  # protocol    = "HTTPS"
   target_type = "ip"
   vpc_id      = data.aws_vpc.default_vpc.id
+  health_check {
+    protocol = "HTTP"
+  }
 }
 
 resource "aws_lb_listener" "ecs_lb_listener" {
   load_balancer_arn = aws_lb.ecs_lb.arn
-  port              = 443
-  protocol          = "HTTPS"
+  port              = 80
+  protocol          = "HTTP"
+  # port              = 443
+  # protocol          = "HTTPS"  
 
   default_action {
     type             = "forward"
@@ -211,7 +218,8 @@ resource "aws_cloudfront_distribution" "ecs_distribution" {
     custom_origin_config {
       http_port              = 80
       https_port             = 443
-      origin_protocol_policy = "https-only"
+      origin_protocol_policy = "http-only"
+      # origin_protocol_policy = "https-only"
       origin_ssl_protocols   = ["TLSv1"]
     }
   }
