@@ -1,7 +1,13 @@
 
 
 provider "aws" {
+  alias = "default"
   region = "eu-west-2"
+}
+
+provider "aws" {
+  alias = "us_east"
+  region = "us-east-1"
 }
 
 resource "aws_ecr_repository" "aws_ecr" {
@@ -248,6 +254,8 @@ resource "aws_cloudfront_distribution" "ecs_distribution" {
 }
 
 resource "aws_wafv2_web_acl" "waf" {
+  provider = aws.us_east
+
   name  = "platform-cdn-waf"
   scope = "CLOUDFRONT"
 
@@ -311,4 +319,8 @@ resource "aws_wafv2_web_acl" "waf" {
     cloudwatch_metrics_enabled = false
     sampled_requests_enabled   = false
   }
+}
+
+resource "aws_s3_bucket" "resources" {
+  bucket = "platform-project-resources"
 }
