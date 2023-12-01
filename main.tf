@@ -1,12 +1,12 @@
 
 
 provider "aws" {
-  alias = "default"
+  alias  = "default"
   region = "eu-west-2"
 }
 
 provider "aws" {
-  alias = "us_east"
+  alias  = "us_east"
   region = "us-east-1"
 }
 
@@ -277,11 +277,6 @@ resource "aws_wafv2_web_acl" "waf" {
         name        = "AWSManagedRulesCommonRuleSet"
         vendor_name = "AWS"
       }
-
-      rate_based_statement {
-        limit              = 300
-        aggregate_key_type = "IP"
-      }
     }
 
     visibility_config {
@@ -319,8 +314,4 @@ resource "aws_wafv2_web_acl" "waf" {
     cloudwatch_metrics_enabled = false
     sampled_requests_enabled   = false
   }
-}
-
-resource "aws_s3_bucket" "resources" {
-  bucket = "platform-project-resources"
 }
