@@ -164,11 +164,25 @@ Ref: https://aws.amazon.com/blogs/compute/centralized-container-logs-with-amazon
 
 In order to use AWS CloudFront, AWS' CDN solution, we need to configure a compatible service first. We're using ECS, so Amaon S3, mediastore container and mediapackage container aren't feasible options. API Gateway requires a load balancer in order to handle distribution of a single route across multiple containers. We don't require any special features from API Gateway right now, so using an Elastic Load Balancer directly is the best option here.
 
+
 #### Elastic Load Balancer 
 
 The Elastic Load Balancer has a few configuration options. Since we are dealing with HTTP requests, the Application Load Balancer is best suited. Ref: https://aws.amazon.com/elasticloadbalancing/faqs/
 
+There are a few steps required to set ELB up. We need to add the ecs service to a target group, create a load balancer, and link the target group to the load balancer with a listener.
 
+Ref: https://docs.aws.amazon.com/AmazonECS/latest/userguide/create-application-load-balancer.html
+
+#### Cloudfront
+
+To access the load balancer, the load balancer's security group needs updating to allow inbound traffic from cloudfront. AWS provides a managed range of IP addresses that CloudFront can use, which can be set as the source. However anyone can create a CloudFront distribution, so to further secure access to the load balancer we need to configure custom headers as per the docs: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/restrict-access-to-load-balancer.html
+
+(https://cloudonaut.io/cloudfront-prefix-list-security-group/)
+
+
+#### Public Certificates
+
+CloudFront can create default certificates for HTTPS communication between CloudFront and viewers from the CloudFront domain, but requires the dev to create a certificate for custom domains and communication to the origin.
 
 ### Troubleshooting
 
