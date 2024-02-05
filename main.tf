@@ -1,14 +1,14 @@
 
 
-# provider "aws" {
-#   alias  = "default"
-#   region = "eu-west-2"
-# }
+provider "aws" {
+  alias  = "default"
+  region = "eu-west-2"
+}
 
-# provider "aws" {
-#   alias  = "us_east"
-#   region = "us-east-1"
-# }
+provider "aws" {
+  alias  = "us_east"
+  region = "us-east-1"
+}
 
 # resource "aws_ecr_repository" "aws_ecr" {
 #   name                 = "platform-training-kerginx"
