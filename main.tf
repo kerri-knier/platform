@@ -10,14 +10,14 @@ provider "aws" {
   region = "us-east-1"
 }
 
-# resource "aws_ecr_repository" "aws_ecr" {
-#   name                 = "platform-training-kerginx"
-#   image_tag_mutability = "IMMUTABLE"
+resource "aws_ecr_repository" "aws_ecr" {
+  name                 = "platform-training-kerginx"
+  image_tag_mutability = "IMMUTABLE"
 
-#   image_scanning_configuration {
-#     scan_on_push = true
-#   }
-# }
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
 
 # resource "aws_ecs_cluster" "aws_ecs" {
 #   name = "platform-training-cluster"
